@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI-Assisted Loan Eligibility Evaluation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>AI-Assisted Loan Eligibility Evaluation</h1>
+
+        <h3>Personal Information</h3>
+        <label>Age</label>
+        <input id="age" type="number">
+
+        <h3>Financial Information</h3>
+        <label>Monthly Income</label>
+        <input id="income" type="number">
+
+        <label>Total Monthly Expenses</label>
+        <input id="expenses" type="number">
+
+        <label>Total Current Debt</label>
+        <input id="debt" type="number">
+
+        <label>Number of Active Loans</label>
+        <input id="activeLoans" type="number">
+
+        <label>Credit Score</label>
+        <input id="score" type="number">
+
+        <h3>Employment</h3>
+        <label>Employment Type</label>
+        <select id="employmentType">
+            <option value="employee">Employee</option>
+            <option value="independent">Independent</option>
+            <option value="contract">Contract</option>
+            <option value="unemployed">Unemployed</option>
+        </select>
+
+        <label>Years in Current Job</label>
+        <input id="employmentYears" type="number">
+
+        <h3>Loan Request</h3>
+        <label>Loan Amount Requested</label>
+        <input id="loanAmount" type="number">
+
+        <label>Loan Term (months)</label>
+        <input id="loanTerm" type="number">
+
+        <label>Purpose of Loan</label>
+        <select id="loanPurpose">
+            <option value="consumption">Consumption</option>
+            <option value="car">Car</option>
+            <option value="education">Education</option>
+            <option value="business">Business</option>
+            <option value="house">House</option>
+            <option value="other">Other</option>
+        </select>
+
+        <button onclick="goToResults()">Evaluate</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

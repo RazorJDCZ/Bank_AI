@@ -1,0 +1,115 @@
+/* FUENTE PREMIUM */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* FONDO PREMIUM */
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: radial-gradient(circle at top left, #1a1a1a, #000000 60%);
+    color: #e8c46c;
+    overflow-x: hidden;
+}
+
+/* EFECTO DE LÍNEAS DORADAS ANIMADAS */
+body::before {
+    content: "";
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(
+        45deg,
+        rgba(212,175,55,0.1) 0px,
+        rgba(212,175,55,0.1) 1px,
+        transparent 2px,
+        transparent 6px
+    );
+    animation: rotate 60s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* CONTENEDOR */
+.container {
+    max-width: 750px;
+    margin: 70px auto;
+    padding: 40px;
+    background: rgba(20,20,20,0.85);
+    border-radius: 20px;
+    border: 2px solid #d4af37;
+    box-shadow: 0 0 40px rgba(212,175,55,0.3);
+}
+
+/* TEXTOS */
+h1 {
+    text-align: center;
+    color: #d4af37;
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+h3 {
+    margin-top: 30px;
+    border-bottom: 1px solid rgba(212,175,55,0.5);
+    padding-bottom: 5px;
+}
+
+/* INPUTS */
+label {
+    margin-top: 12px;
+    display: block;
+    font-size: 14px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-top: 5px;
+    background: #111;
+    color: #e8c46c;
+    border: 1px solid #d4af37;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    box-shadow: 0 0 10px #d4af37;
+}
+
+/* BOTÓN */
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+    cursor: pointer;
+    color: black;
+    letter-spacing: 1px;
+    transition: 0.25s;
+}
+
+button:hover {
+    box-shadow: 0 0 12px #e8c46c;
+    background: linear-gradient(135deg, #f5d88c, #d4af37);
+}
+
+/* RESULT PAGE CARD */
+.result-card {
+    background: rgba(30, 30, 30, 0.85);
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid #d4af37;
+    margin-top: 20px;
+    white-space: pre-wrap;
+}
