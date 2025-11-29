@@ -1,87 +1,73 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from typing import Literal, Optional, Dict, Any
-import os
-
-# Si luego quieres usar OpenAI de verdad:
-try:
-    from openai import OpenAI
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-except Exception:
-    client = None  # No rompe si no está configurado aún
-
-# -------------------------
-#   FASTAPI APP
-# -------------------------
+from typing import Literal, Dict, Any
 
 app = FastAPI(
     title="AI-Assisted Loan Eligibility Evaluation API",
-    description="Backend with agent-based evaluation for loan eligibility.",
-    version="1.0.0"
+    description="Multi-agent pipeline for loan evaluation with full dashboard.",
+    version="3.0"
 )
 
-# Permitir llamadas desde tu HTML (misma máquina)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # si quieres, luego restringes
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# -------------------------
-#   DATA MODEL
-# -------------------------
 
+# -----------------------------
+#  INPUT MODEL
+# -----------------------------
 class LoanApplication(BaseModel):
-    age: int = Field(..., ge=18, description="Applicant age")
-    income: float = Field(..., ge=0, description="Monthly income")
-    expenses: float = Field(..., ge=0, description="Monthly expenses")
-    debt: float = Field(..., ge=0, description="Total current debt")
-    activeLoans: int = Field(..., ge=0, description="Number of active loans")
-    creditScore: int = Field(..., ge=0, le=900, description="Credit score")
+    age: int = Field(..., ge=18)
+    income: float = Field(..., ge=0)
+    expenses: float = Field(..., ge=0)
+    debt: float = Field(..., ge=0)
+    activeLoans: int = Field(..., ge=0)
+    creditScore: int = Field(..., ge=0, le=900)
     employmentType: Literal["employee", "independent", "contract", "unemployed"]
-    employmentYears: float = Field(..., ge=0, description="Years in current job")
-    loanAmount: float = Field(..., ge=0, description="Requested loan amount")
-    loanTerm: int = Field(..., ge=1, description="Loan term in months")
+    employmentYears: float = Field(..., ge=0)
+    loanAmount: float = Field(..., ge=0)
+    loanTerm: int = Field(..., ge=1)
     loanPurpose: Literal["consumption", "car", "education", "business", "house", "other"]
 
 
-# -------------------------
-#   AGENTES
-# -------------------------
-
+# -----------------------------
+#  AGENT 1 – DATA AGENT
+# -----------------------------
 class DataAgent:
-    """Valida y prepara los datos básicos del solicitante."""
-    def process(self, app_data: LoanApplication) -> Dict[str, Any]:
-        dti = (app_data.debt + app_data.expenses) / app_data.income if app_data.income > 0 else 1e9
-        income_after_expenses = app_data.income - app_data.expenses
-
+    def process(self, d: LoanApplication) -> Dict[str, Any]:
+        dti = (d.debt + d.expenses) / d.income if d.income > 0 else 1e9
+        surplus = d.income - d.expenses
         return {
-            "age": app_data.age,
-            "income": app_data.income,
-            "expenses": app_data.expenses,
-            "debt": app_data.debt,
-            "active_loans": app_data.activeLoans,
-            "credit_score": app_data.creditScore,
-            "employment_type": app_data.employmentType,
-            "employment_years": app_data.employmentYears,
-            "loan_amount": app_data.loanAmount,
-            "loan_term": app_data.loanTerm,
-            "loan_purpose": app_data.loanPurpose,
+            "age": d.age,
+            "income": d.income,
+            "expenses": d.expenses,
+            "debt": d.debt,
+            "active_loans": d.activeLoans,
+            "credit_score": d.creditScore,
+            "employment_type": d.employmentType,
+            "employment_years": d.employmentYears,
+            "loan_amount": d.loanAmount,
+            "loan_term": d.loanTerm,
+            "loan_purpose": d.loanPurpose,
             "dti": dti,
-            "income_after_expenses": income_after_expenses
+            "income_after_expenses": surplus
         }
 
 
+# -----------------------------
+#  AGENT 2 – RISK AGENT
+# -----------------------------
 class RiskAgent:
-    """Evalúa el riesgo financiero basado en DTI, score, estabilidad y monto."""
-    def evaluate(self, processed: Dict[str, Any]) -> Dict[str, Any]:
+    def evaluate(self, p: Dict[str, Any]) -> Dict[str, Any]:
         risk_score = 0
         reasons = []
 
-        dti = processed["dti"]
+        dti = p["dti"]
         if dti > 0.6:
             risk_score += 3
             reasons.append("Debt-to-income ratio is very high.")
@@ -92,7 +78,7 @@ class RiskAgent:
             risk_score += 1
             reasons.append("Debt-to-income ratio is slightly elevated.")
 
-        cs = processed["credit_score"]
+        cs = p["credit_score"]
         if cs < 550:
             risk_score += 3
             reasons.append("Very low credit score.")
@@ -103,197 +89,306 @@ class RiskAgent:
             risk_score += 1
             reasons.append("Moderate credit score.")
 
-        if processed["employment_years"] < 1 and processed["employment_type"] in ["employee", "contract"]:
+        if p["employment_years"] < 1 and p["employment_type"] != "independent":
             risk_score += 1
             reasons.append("Short employment history in current job.")
 
-        if processed["active_loans"] >= 4:
+        if p["active_loans"] >= 4:
             risk_score += 2
             reasons.append("There are several active loans.")
 
-        if processed["loan_amount"] > processed["income"] * 15:
+        if p["loan_amount"] > p["income"] * 15:
             risk_score += 2
             reasons.append("Requested amount is very high relative to income.")
-        elif processed["loan_amount"] > processed["income"] * 10:
+        elif p["loan_amount"] > p["income"] * 10:
             risk_score += 1
             reasons.append("Requested amount is high relative to income.")
 
-        risk_level = "low"
         if risk_score >= 6:
-            risk_level = "high"
+            level = "high"
         elif risk_score >= 3:
-            risk_level = "medium"
+            level = "medium"
+        else:
+            level = "low"
+
+        if level == "low":
+            risk_percent = 20 + risk_score * 4
+        elif level == "medium":
+            risk_percent = 40 + risk_score * 7
+        else:
+            risk_percent = 70 + risk_score * 5
 
         return {
             "risk_score_numeric": risk_score,
-            "risk_level": risk_level,
+            "risk_level": level,
+            "risk_percentage": min(100, risk_percent),
             "reasons": reasons
         }
 
 
+# -----------------------------
+#  AGENT 3 – COMPLIANCE AGENT
+# -----------------------------
 class ComplianceAgent:
-    """Verifica requisitos mínimos del banco (edad, ingresos, empleo, score mínimo)."""
-    def check(self, processed: Dict[str, Any]) -> Dict[str, Any]:
+    def check(self, p: Dict[str, Any]) -> Dict[str, Any]:
         reasons = []
-
-        if processed["age"] < 18:
-            reasons.append("Applicant is under the minimum age requirement.")
-
-        if processed["income"] < 400:
-            reasons.append("Monthly income is below the minimum threshold.")
-
-        if processed["employment_type"] == "unemployed":
-            reasons.append("Applicant is currently unemployed.")
-
-        if processed["employment_years"] < 0.5 and processed["employment_type"] != "independent":
-            reasons.append("Applicant has very low stability in current job.")
-
-        if processed["credit_score"] < 500:
-            reasons.append("Credit score is below the minimum required.")
-
-        status = "pass" if len(reasons) == 0 else "fail"
-
-        return {
-            "status": status,
-            "reasons": reasons
-        }
+        if p["income"] < 400:
+            reasons.append("Income is below the minimum threshold.")
+        if p["employment_type"] == "unemployed":
+            reasons.append("Applicant is unemployed.")
+        if p["employment_years"] < 0.5 and p["employment_type"] != "independent":
+            reasons.append("Employment stability is very low.")
+        if p["credit_score"] < 500:
+            reasons.append("Credit score is below the minimum allowed.")
+        status = "pass" if not reasons else "fail"
+        return {"status": status, "reasons": reasons}
 
 
+# -----------------------------
+#  AGENT 4 – DECISION AGENT
+# -----------------------------
 class DecisionAgent:
-    """Combina compliance + riesgo y decide: APPROVED / REJECTED / CONDITIONAL."""
-    def decide(
-        self,
-        processed: Dict[str, Any],
-        risk: Dict[str, Any],
-        compliance: Dict[str, Any]
-    ) -> Dict[str, Any]:
-
+    def decide(self, p, risk, compliance):
         if compliance["status"] == "fail":
             return {
                 "decision": "REJECTED",
-                "reason": "Did not meet minimum bank requirements.",
-                "details": {
-                    "compliance_issues": compliance["reasons"],
-                    "risk_level": risk["risk_level"],
-                    "risk_reasons": risk["reasons"]
-                }
+                "short_reason": "Minimum bank requirements were not met.",
+                "category": "compliance_fail"
             }
-
-        # Si pasa compliance, revisamos riesgo
         if risk["risk_level"] == "high":
             return {
                 "decision": "REJECTED",
-                "reason": "Financial risk is too high.",
-                "details": {
-                    "compliance_issues": [],
-                    "risk_level": risk["risk_level"],
-                    "risk_reasons": risk["reasons"]
-                }
+                "short_reason": "Overall risk is too high to approve safely.",
+                "category": "high_risk"
             }
-
         if risk["risk_level"] == "medium":
-            # Aprobación condicional
             return {
                 "decision": "CONDITIONAL APPROVAL",
-                "reason": "Medium risk. Suggested to lower loan amount or adjust terms.",
-                "details": {
-                    "suggested_max_amount": round(processed["income"] * 8, 2),
-                    "risk_level": risk["risk_level"],
-                    "risk_reasons": risk["reasons"]
-                }
+                "short_reason": "Medium risk. Loan should be approved with conditions.",
+                "category": "medium_risk"
             }
-
-        # Riesgo bajo + compliance ok
         return {
             "decision": "APPROVED",
-            "reason": "Applicant meets minimum requirements with acceptable risk.",
-            "details": {
-                "risk_level": risk["risk_level"],
-                "risk_reasons": risk["reasons"]
-            }
+            "short_reason": "Risk profile is acceptable for approval.",
+            "category": "low_risk"
         }
 
 
+# -----------------------------
+#  AGENT 5 – EXPLANATION AGENT
+# -----------------------------
 class ExplanationAgent:
     """
-    Opcional: usa OpenAI para generar un análisis en lenguaje natural
-    basado en los resultados de los agentes anteriores.
+    Generates deep financial analysis, extended recommendations,
+    and a full professional narrative of the decision.
     """
-    def explain(
-        self,
-        processed: Dict[str, Any],
-        risk: Dict[str, Any],
-        compliance: Dict[str, Any],
-        decision: Dict[str, Any]
-    ) -> str:
 
-        # Si no hay cliente OpenAI configurado, devolvemos una explicación manual simple
-        if client is None:
-            return (
-                f"Decision: {decision['decision']}. "
-                f"Reason: {decision['reason']}. "
-                f"Key factors considered: debt-to-income ratio, credit score, "
-                f"employment stability, and basic bank eligibility rules."
-            )
+    def explain(self, p, risk, compliance, decision):
 
-        # Si quieres usar OpenAI de verdad:
-        prompt = f"""
-You are a loan officer. Based on the following data, write a clear, concise explanation
-(around 150-200 words) of why the applicant was APPROVED, REJECTED, or CONDITIONALLY APPROVED.
+        dti = p["dti"]
+        monthly_free = p["income_after_expenses"]
+        income = p["income"]
+        expenses = p["expenses"]
+        debt = p["debt"]
+        score = p["credit_score"]
+        loans = p["active_loans"]
+        loan_amount = p["loan_amount"]
+        term = p["loan_term"]
 
-Processed data: {processed}
-Risk evaluation: {risk}
-Compliance check: {compliance}
-Final decision: {decision}
+        # Suggested interest rate band based on risk %
+        r = risk["risk_percentage"]
+        if r < 35:
+            interest = "8% – 11%"
+        elif r < 60:
+            interest = "12% – 16%"
+        elif r < 80:
+            interest = "17% – 22%"
+        else:
+            interest = "23% – 32% (very high risk segment)"
 
-Explain in neutral, professional English. Mention main strengths and weaknesses.
+        deep = f"""
+The applicant's financial profile shows a combination of strengths and structural vulnerabilities that must be 
+carefully balanced. The current debt-to-income (DTI) ratio is {dti:.2f}, which places the case in the 
+{risk['risk_level'].upper()} risk band. Ratios above 0.50 are usually associated with limited flexibility to absorb 
+unexpected expenses or income drops, so this indicator is a central driver of the overall risk classification.
+
+Monthly residual income after covering reported expenses is {monthly_free:.2f}. This value represents the 
+actual liquidity available to service new debt and is more relevant than the gross income figure of {income:.2f}. 
+When combining expenses and existing debt obligations, they absorb approximately {((expenses + debt) / income) * 100:.1f}% 
+of the monthly income, which indicates a moderately stressed budget.
+
+The credit score of {score} suggests a history with some delays, limited credit depth, or a mix of credit products 
+that has not always been optimally managed. The presence of {loans} active loans amplifies this risk, since households 
+with multiple ongoing obligations are more exposed to interest accumulation and administrative complexity.
+
+Employment stability of {p['employment_years']:.1f} years provides a partial anchor to the analysis. While this is not 
+a weak point, a longer and more consistent work history would further reduce risk. The requested amount of {loan_amount:.2f} 
+over {term} months may be affordable under current conditions, but it leaves limited buffer if interest rates increase or 
+if personal income is temporarily reduced.
 """
 
-        try:
-            # Ejemplo con Responses API moderna:
-            response = client.responses.create(
-                model="gpt-4.1-mini",
-                input=prompt,
-            )
-            text = response.output[0].content[0].text
-            return text
-        except Exception as e:
-            return (
-                f"Decision: {decision['decision']}. "
-                f"Reason: {decision['reason']}. "
-                f"(Explanation agent failed: {e})"
-            )
+        rec = """
+Based on the current indicators, the following actions are recommended to improve the applicant’s risk profile:
+
+• Reduce outstanding debt, prioritizing products with the highest interest rates, to bring the DTI closer to the 0.30–0.35 range.  
+• Avoid opening new credit lines or increasing credit card limits during the next 6–12 months.  
+• Improve credit score by paying installments before the due date and avoiding missed payments.  
+• Build a small emergency fund so that unexpected events do not directly affect repayment capacity.  
+• Renegotiate or consolidate some existing debts if there are multiple small obligations with high rates.  
+• Consider requesting a slightly lower loan amount or a longer term to reduce monthly payment pressure.  
+• Maintain employment stability and, when possible, document income growth or promotion perspectives.  
+"""
+
+        conclusion = f"""
+Final decision: {decision['decision']}.
+{decision['short_reason']}
+
+From a prudential perspective, the applicant does not present an extreme risk profile, but the combination of 
+DTI, credit score and multi-loan exposure requires conservative conditions. Under the current situation, 
+the loan is better positioned as a conditional or tightly monitored approval rather than a standard product.
+
+If the recommended measures are implemented — particularly debt reduction and credit score improvement — 
+the applicant could migrate to a significantly stronger risk category within 4–8 months. At that point, 
+renegotiation of conditions or access to more favorable rates would be technically justified.
+"""
+
+        return {
+            "deep_analysis": deep.strip(),
+            "recommendations": rec.strip(),
+            "final_conclusion": conclusion.strip(),
+            "suggested_interest_rate": interest.strip()
+        }
 
 
-# -------------------------
-#   ENDPOINT PRINCIPAL
-# -------------------------
+# -----------------------------
+#  DASHBOARD METRICS + CHART DATA
+# -----------------------------
+def build_dashboard(p: Dict[str, Any], risk: Dict[str, Any], compliance: Dict[str, Any]):
+    income = p["income"]
+    expenses = p["expenses"]
+    debt = p["debt"]
+    monthly_free = p["income_after_expenses"]
+    loan_amount = p["loan_amount"]
+    term = p["loan_term"]
+    dti = p["dti"]
+    score = p["credit_score"]
 
+    # Loan installment estimation (simple amortization with risk-based rate)
+    if risk["risk_level"] == "low":
+        annual_rate = 0.14
+    elif risk["risk_level"] == "medium":
+        annual_rate = 0.18
+    else:
+        annual_rate = 0.24
+
+    monthly_rate = annual_rate / 12 if term > 0 else 0
+    if monthly_rate > 0 and term > 0:
+        factor = (monthly_rate * (1 + monthly_rate) ** term) / ((1 + monthly_rate) ** term - 1)
+        installment = loan_amount * factor
+    else:
+        installment = loan_amount / term if term > 0 else 0
+
+    inst_to_free = installment / monthly_free if monthly_free > 0 else 10.0
+    loan_to_income = loan_amount / (income * 12) if income > 0 else 0
+    expense_ratio = (expenses + debt) / income if income > 0 else 1
+
+    # DTI simulation with debt reduction
+    def dti_with_factor(f):
+        if income <= 0:
+            return dti
+        return ((debt * f) + expenses) / income
+
+    dti10 = dti_with_factor(0.9)
+    dti20 = dti_with_factor(0.8)
+    dti30 = dti_with_factor(0.7)
+
+    # Traffic light logic
+    if risk["risk_level"] == "low":
+        risk_light = "green"
+    elif risk["risk_level"] == "medium":
+        risk_light = "yellow"
+    else:
+        risk_light = "red"
+
+    if inst_to_free < 0.30:
+        afford_light = "green"
+    elif inst_to_free < 0.50:
+        afford_light = "yellow"
+    else:
+        afford_light = "red"
+
+    compliance_light = "green" if compliance["status"] == "pass" else "red"
+
+    charts = {
+        "risk_gauge": {"value": risk["risk_percentage"]},
+        "income_vs_expenses": {
+            "income": income,
+            "expenses": expenses,
+            "debt": debt
+        },
+        "dti_simulation": {
+            "current": dti,
+            "minus10": dti10,
+            "minus20": dti20,
+            "minus30": dti30
+        },
+        "affordability": {
+            "installment": installment,
+            "free_income": monthly_free
+        },
+        "credit_score": {
+            "score": score
+        },
+        "loan_to_income": {
+            "ratio": loan_to_income
+        }
+    }
+
+    metrics = {
+        "dti": dti,
+        "monthly_free": monthly_free,
+        "expense_ratio": expense_ratio,
+        "estimated_installment": installment,
+        "installment_to_free_income": inst_to_free,
+        "loan_to_income_ratio": loan_to_income
+    }
+
+    traffic_lights = {
+        "risk": risk_light,
+        "affordability": afford_light,
+        "compliance": compliance_light
+    }
+
+    return charts, metrics, traffic_lights
+
+
+# -----------------------------
+#  ENDPOINT
+# -----------------------------
 @app.post("/evaluate-loan-advanced")
-def evaluate_loan_advanced(application: LoanApplication):
-    data_agent = DataAgent()
-    risk_agent = RiskAgent()
-    compliance_agent = ComplianceAgent()
-    decision_agent = DecisionAgent()
-    explanation_agent = ExplanationAgent()
-
-    processed = data_agent.process(application)
-    risk_result = risk_agent.evaluate(processed)
-    compliance_result = compliance_agent.check(processed)
-    decision_result = decision_agent.decide(processed, risk_result, compliance_result)
-    explanation_text = explanation_agent.explain(
-        processed, risk_result, compliance_result, decision_result
-    )
+def evaluate(application: LoanApplication):
+    data = DataAgent().process(application)
+    risk = RiskAgent().evaluate(data)
+    compliance = ComplianceAgent().check(data)
+    decision = DecisionAgent().decide(data, risk, compliance)
+    explanation = ExplanationAgent().explain(data, risk, compliance, decision)
+    charts, metrics, lights = build_dashboard(data, risk, compliance)
 
     return {
-        "input_summary": processed,
-        "risk_analysis": risk_result,
-        "compliance_analysis": compliance_result,
-        "final_decision": decision_result,
-        "natural_language_explanation": explanation_text
+        "input_summary": data,
+        "risk_analysis": risk,
+        "compliance_analysis": compliance,
+        "final_decision": decision,
+        "charts": charts,
+        "dashboard_metrics": metrics,
+        "traffic_lights": lights,
+        "deep_analysis": explanation["deep_analysis"],
+        "recommendations": explanation["recommendations"],
+        "final_conclusion": explanation["final_conclusion"],
+        "suggested_interest_rate": explanation["suggested_interest_rate"]
     }
 
 
 @app.get("/")
 def root():
-    return {"message": "Loan Evaluation API is running."}
+    return {"message": "AI Loan Evaluation backend running"}
