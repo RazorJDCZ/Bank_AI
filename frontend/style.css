@@ -1,115 +1,397 @@
-/* FUENTE PREMIUM */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+/* ============================================
+   GLOBAL BACKGROUND + GOLD ANIMATION
+   ============================================ */
 
-/* FONDO PREMIUM */
 body {
     margin: 0;
-    font-family: "Poppins", sans-serif;
-    background: radial-gradient(circle at top left, #1a1a1a, #000000 60%);
-    color: #e8c46c;
+    padding: 0;
+    background: #000;
+    color: #d4af37;
+    font-family: "Segoe UI", sans-serif;
     overflow-x: hidden;
+
+    /* Layer 1 — subtle golden diagonal stripes */
+    background-image:
+        repeating-linear-gradient(
+            135deg,
+            rgba(212, 175, 55, 0.06) 0px,
+            rgba(212, 175, 55, 0.06) 2px,
+            rgba(0, 0, 0, 0.0) 2px,
+            rgba(0, 0, 0, 0.0) 12px
+        );
+
+    /* Layer 2 — soft golden glow moving animation */
+    animation: bgMove 26s linear infinite;
+    background-size: 200% 200%;
 }
 
-/* EFECTO DE LÍNEAS DORADAS ANIMADAS */
-body::before {
-    content: "";
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: repeating-linear-gradient(
-        45deg,
-        rgba(212,175,55,0.1) 0px,
-        rgba(212,175,55,0.1) 1px,
-        transparent 2px,
-        transparent 6px
-    );
-    animation: rotate 60s linear infinite;
-    pointer-events: none;
+@keyframes bgMove {
+    0%   { background-position: 0 0; }
+    50%  { background-position: 1200px 1200px; }
+    100% { background-position: 0 0; }
 }
 
-@keyframes rotate {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
 
-/* CONTENEDOR */
+/* ============================================
+   CONTAINER
+   ============================================ */
+
 .container {
-    max-width: 750px;
-    margin: 70px auto;
-    padding: 40px;
-    background: rgba(20,20,20,0.85);
-    border-radius: 20px;
-    border: 2px solid #d4af37;
-    box-shadow: 0 0 40px rgba(212,175,55,0.3);
+    max-width: 900px;
+    margin: auto;
+    padding: 40px 30px;
 }
 
-/* TEXTOS */
+
+/* ============================================
+   TITLES
+   ============================================ */
+
 h1 {
     text-align: center;
+    font-size: 40px;
+    margin-bottom: 35px;
+    font-weight: bold;
     color: #d4af37;
-    font-size: 32px;
-    font-weight: 600;
     letter-spacing: 1px;
 }
 
-h3 {
-    margin-top: 30px;
-    border-bottom: 1px solid rgba(212,175,55,0.5);
-    padding-bottom: 5px;
+h2, h3 {
+    margin: 0 0 15px 0;
+    color: #d4af37;
+    font-weight: 600;
 }
 
-/* INPUTS */
-label {
-    margin-top: 12px;
+
+/* ============================================
+   CARD (WITH GOLD BORDER)
+   ============================================ */
+
+.card {
+    background: rgba(15, 15, 15, 0.92);
+    border-radius: 16px;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    padding: 30px 40px;
+    margin-bottom: 35px;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.06);
+}
+
+
+/* ============================================
+   INPUT GROUP (better proportions)
+   ============================================ */
+
+.input-group {
+    width: 70%;
+    min-width: 260px;
+    margin-bottom: 18px;
+}
+
+.input-group label {
     display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    opacity: 0.9;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #b88a2b;
+    background: rgba(0, 0, 0, 0.85);
+    color: #fff;
+    font-size: 15px;
+    transition: 0.2s ease-in-out;
+}
+
+.input-group input:hover,
+.input-group select:hover {
+    border-color: #d4af37;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 10px rgba(212,175,55,0.45);
+}
+
+
+/* ============================================
+   BUTTON (improved)
+   ============================================ */
+
+.btn {
+    margin-top: 25px;
+    width: 50%;
+    min-width: 200px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+
+    background: linear-gradient(90deg, #d4af37, #f2d675);
+    color: #000;
+    font-weight: bold;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.btn:hover {
+    transform: scale(1.04);
+    background: linear-gradient(90deg, #e6c556, #f7e2a0);
+    box-shadow: 0 0 18px rgba(212, 175, 55, 0.55);
+}
+
+
+/* ============================================
+   RESULTS PAGE FLEX LAYOUT
+   ============================================ */
+
+.row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.half {
+    flex: 1;
+    min-width: 280px;
+}
+
+
+/* ============================================
+   BADGES (decision)
+   ============================================ */
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    border: 1px solid #d4af37;
+    display: inline-block;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.badge-approve    { background: #4caf50; color: black; }
+.badge-conditional{ background: #ff9800; color: black; }
+.badge-reject     { background: #f44336; color: black; }
+
+.muted {
+    opacity: 0.8;
     font-size: 14px;
 }
 
-input, select {
+
+/* ============================================
+   RISK GAUGE LABEL
+   ============================================ */
+
+.gauge-text {
+    text-align: center;
+    font-size: 34px;
+    font-weight: bold;
+    margin-top: -12px;
+    color: #d4af37;
+}
+
+/* ===============================
+   COLLAPSIBLE CARDS
+   =============================== */
+
+.collapsible .collapse-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.collapse-header h3 {
+    margin: 0;
+}
+
+.collapse-icon {
+    font-size: 18px;
+    color: #d4af37;
+}
+
+.collapse-body {
+    max-height: 600px;
+    overflow: hidden;
+    transition: max-height 0.25s ease, padding-top 0.25s ease;
+    padding-top: 10px;
+}
+
+.collapse-body.collapsed {
+    max-height: 0;
+    padding-top: 0;
+}
+
+
+/* ===============================
+   TRAFFIC LIGHT INDICATORS
+   =============================== */
+
+.traffic-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.status-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.status-dot.green  { background: #4caf50; }
+.status-dot.yellow { background: #ffeb3b; }
+.status-dot.red    { background: #f44336; }
+
+
+/* MAKES THE FORM NARROWER & CENTERED */
+.container-narrow {
+    max-width: 650px;
+    margin: 60px auto;
+    padding: 40px;
+}
+
+
+/* MAIN TITLE STYLING */
+.title-main {
+    text-align: center;
+    font-size: 36px;
+    margin-bottom: 40px;
+    color: #d4af37;
+    font-weight: 700;
+}
+
+
+/* CARD OPTIMIZATION */
+.card {
+    background: rgba(15, 15, 15, 0.92);
+    border-radius: 14px;
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    padding: 25px 40px;
+    margin-bottom: 35px;
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.05);
+}
+
+
+/* INPUT GROUPS */
+.input-group {
+    margin-bottom: 18px;
     width: 100%;
-    padding: 12px;
-    margin-top: 5px;
-    background: #111;
-    color: #e8c46c;
-    border: 1px solid #d4af37;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    margin-bottom: 6px;
+    font-size: 14px;
+    opacity: 0.85;
+    color: #d4af37;
+}
+
+
+/* INPUTS STYLING */
+input, select {
+    padding: 12px 14px;
     border-radius: 8px;
+    border: 1px solid #b88a2b;
+    background: rgba(0, 0, 0, 0.75);
+    color: #fff;
     font-size: 15px;
+    transition: 0.25s ease;
+    width: 100%;
+}
+
+.input-short {
+    max-width: 180px;
+}
+
+/* REMOVE NUMBER SPINNERS */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* INPUT HOVER/FOCUS EFFECT */
+input:hover, select:hover {
+    border-color: #e0c15a;
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.25);
 }
 
 input:focus, select:focus {
     outline: none;
-    box-shadow: 0 0 10px #d4af37;
+    border-color: #d4af37;
+    box-shadow: 0 0 12px rgba(212, 175, 55, 0.55);
 }
 
-/* BOTÓN */
-button {
-    width: 100%;
-    padding: 15px;
-    margin-top: 15px;
-    font-size: 18px;
+
+/* BUTTON PREMIUM */
+.btn-evaluate {
+    margin-top: 25px;
+    width: 70%;
+    background: linear-gradient(180deg, #f1d97a, #d4af37);
+    color: #000;
     font-weight: bold;
+    padding: 14px;
+    border-radius: 10px;
     border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #d4af37, #b8860b);
     cursor: pointer;
-    color: black;
-    letter-spacing: 1px;
-    transition: 0.25s;
+    font-size: 18px;
+    transition: 0.2s ease-in-out;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
-button:hover {
-    box-shadow: 0 0 12px #e8c46c;
-    background: linear-gradient(135deg, #f5d88c, #d4af37);
+.btn-evaluate:hover {
+    background: linear-gradient(180deg, #ffeaa8, #e6c75b);
+    transform: scale(1.03);
 }
 
-/* RESULT PAGE CARD */
-.result-card {
-    background: rgba(30, 30, 30, 0.85);
-    padding: 25px;
-    border-radius: 15px;
-    border: 1px solid #d4af37;
-    margin-top: 20px;
-    white-space: pre-wrap;
+
+/* TITLE INSIDE CARDS */
+.card h2 {
+    margin-top: 0;
+    margin-bottom: 18px;
+    font-size: 22px;
+    color: #d4af37;
+}
+
+
+/* ANIMATION TOUCH – GOLDEN MOVING BACKGROUND */
+body {
+    background-image:
+        repeating-linear-gradient(
+            135deg,
+            rgba(212, 175, 55, 0.05) 0px,
+            rgba(212, 175, 55, 0.05) 2px,
+            rgba(0, 0, 0, 0) 2px,
+            rgba(0, 0, 0, 0) 12px
+        );
+    animation: goldMove 28s linear infinite;
+}
+
+@keyframes goldMove {
+    from { background-position: 0 0; }
+    to { background-position: 2800px 2800px; }
 }
