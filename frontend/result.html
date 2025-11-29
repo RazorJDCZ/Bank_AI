@@ -4,17 +4,111 @@
     <meta charset="UTF-8">
     <title>Loan Evaluation Results</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Loan Evaluation Results</h1>
+<div class="container">
+    <h1>Loan Evaluation Results</h1>
 
-        <div id="analysis" class="result-card">
-            Loading evaluation...
+    <!-- DECISION MAIN CARD -->
+    <div class="card decision-card">
+        <span id="decisionBadge" class="badge">DECISION</span>
+        <h2 id="decisionText"></h2>
+        <p id="decisionReason" class="muted"></p>
+    </div>
+
+    <!-- EXECUTIVE SUMMARY + TRAFFIC LIGHTS -->
+    <div class="card">
+        <h3>Executive Summary</h3>
+        <div id="trafficIndicators"></div>
+        <ul id="execSummaryList"></ul>
+    </div>
+
+    <!-- RISK GAUGE + KEY FINANCIAL METRICS -->
+    <div class="row">
+        <div class="card half">
+            <h3>Risk Level</h3>
+            <canvas id="riskGauge"></canvas>
+            <div id="gaugeLabel" class="gauge-text"></div>
+            <p class="muted" id="riskLabel"></p>
+        </div>
+
+        <div class="card half">
+            <h3>Key Financial Metrics</h3>
+            <p id="metricsText"></p>
+            <canvas id="incomeChart"></canvas>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- DTI SIMULATION + AFFORDABILITY -->
+    <div class="row">
+        <div class="card half">
+            <h3>DTI Scenarios (Debt Reduction)</h3>
+            <canvas id="dtiChart"></canvas>
+        </div>
+
+        <div class="card half">
+            <h3>Affordability: Installment vs Free Income</h3>
+            <canvas id="affordChart"></canvas>
+        </div>
+    </div>
+
+    <!-- CREDIT SCORE + LOAN TO INCOME -->
+    <div class="row">
+        <div class="card half">
+            <h3>Credit Score Position</h3>
+            <canvas id="scoreChart"></canvas>
+        </div>
+        <div class="card half">
+            <h3>Loan to Income Ratio</h3>
+            <canvas id="ltiChart"></canvas>
+        </div>
+    </div>
+
+    <!-- AGENT ANALYSIS -->
+    <div class="card">
+        <h3>Agent Analysis</h3>
+        <div id="agentAnalysis"></div>
+    </div>
+
+    <!-- COLLAPSIBLE TEXT CARDS -->
+    <div class="card collapsible">
+        <div class="collapse-header" onclick="toggleCollapse('deepBody')">
+            <h3>Deep Analysis</h3>
+            <span class="collapse-icon" id="icon-deepBody">▼</span>
+        </div>
+        <div class="collapse-body" id="deepBody">
+            <p id="deepAnalysis"></p>
+        </div>
+    </div>
+
+    <div class="card collapsible">
+        <div class="collapse-header" onclick="toggleCollapse('recBody')">
+            <h3>Recommendations</h3>
+            <span class="collapse-icon" id="icon-recBody">▼</span>
+        </div>
+        <div class="collapse-body" id="recBody">
+            <p id="recommendations"></p>
+        </div>
+    </div>
+
+    <div class="card collapsible">
+        <div class="collapse-header" onclick="toggleCollapse('concBody')">
+            <h3>Final Conclusion</h3>
+            <span class="collapse-icon" id="icon-concBody">▼</span>
+        </div>
+        <div class="collapse-body" id="concBody">
+            <p id="finalConclusion"></p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Suggested Interest Rate</h3>
+        <p id="interestRate"></p>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
