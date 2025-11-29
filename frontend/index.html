@@ -7,61 +7,102 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>AI-Assisted Loan Eligibility Evaluation</h1>
 
-        <h3>Personal Information</h3>
-        <label>Age</label>
-        <input id="age" type="number">
+<div class="container-narrow">
 
-        <h3>Financial Information</h3>
-        <label>Monthly Income</label>
-        <input id="income" type="number">
+    <h1 class="title-main">AI-Assisted Loan Eligibility Evaluation</h1>
 
-        <label>Total Monthly Expenses</label>
-        <input id="expenses" type="number">
+    <!-- PERSONAL INFO -->
+    <div class="card">
+        <h2>Personal Information</h2>
 
-        <label>Total Current Debt</label>
-        <input id="debt" type="number">
-
-        <label>Number of Active Loans</label>
-        <input id="activeLoans" type="number">
-
-        <label>Credit Score</label>
-        <input id="score" type="number">
-
-        <h3>Employment</h3>
-        <label>Employment Type</label>
-        <select id="employmentType">
-            <option value="employee">Employee</option>
-            <option value="independent">Independent</option>
-            <option value="contract">Contract</option>
-            <option value="unemployed">Unemployed</option>
-        </select>
-
-        <label>Years in Current Job</label>
-        <input id="employmentYears" type="number">
-
-        <h3>Loan Request</h3>
-        <label>Loan Amount Requested</label>
-        <input id="loanAmount" type="number">
-
-        <label>Loan Term (months)</label>
-        <input id="loanTerm" type="number">
-
-        <label>Purpose of Loan</label>
-        <select id="loanPurpose">
-            <option value="consumption">Consumption</option>
-            <option value="car">Car</option>
-            <option value="education">Education</option>
-            <option value="business">Business</option>
-            <option value="house">House</option>
-            <option value="other">Other</option>
-        </select>
-
-        <button onclick="goToResults()">Evaluate</button>
+        <div class="input-group">
+            <label>Age</label>
+            <input id="age" type="number" class="input-short">
+        </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- FINANCIAL -->
+    <div class="card">
+        <h2>Financial Information</h2>
+
+        <div class="input-group">
+            <label>Monthly Income</label>
+            <input id="income" type="number">
+        </div>
+
+        <div class="input-group">
+            <label>Total Monthly Expenses</label>
+            <input id="expenses" type="number">
+        </div>
+
+        <div class="input-group">
+            <label>Total Current Debt</label>
+            <input id="debt" type="number">
+        </div>
+
+        <div class="input-group">
+            <label>Number of Active Loans</label>
+            <input id="activeLoans" type="number" class="input-short">
+        </div>
+
+        <div class="input-group">
+            <label>Credit Score</label>
+            <input id="score" type="number" class="input-short">
+        </div>
+    </div>
+
+    <!-- EMPLOYMENT -->
+    <div class="card">
+        <h2>Employment</h2>
+
+        <div class="input-group">
+            <label>Employment Type</label>
+            <select id="employmentType">
+                <option value="employee">Employee</option>
+                <option value="independent">Independent</option>
+                <option value="contract">Contract</option>
+                <option value="unemployed">Unemployed</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>Years in Current Job</label>
+            <input id="employmentYears" type="number" class="input-short">
+        </div>
+    </div>
+
+    <!-- LOAN REQUEST -->
+    <div class="card">
+        <h2>Loan Request</h2>
+
+        <div class="input-group">
+            <label>Loan Amount Requested</label>
+            <input id="loanAmount" type="number">
+        </div>
+
+        <div class="input-group">
+            <label>Loan Term (months)</label>
+            <input id="loanTerm" type="number" class="input-short">
+        </div>
+
+        <div class="input-group">
+            <label>Purpose of Loan</label>
+            <select id="loanPurpose">
+                <option value="consumption">Consumption</option>
+                <option value="car">Car</option>
+                <option value="education">Education</option>
+                <option value="business">Business</option>
+                <option value="house">House</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+
+        <button class="btn-evaluate" onclick="goToResults()">Evaluate</button>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
