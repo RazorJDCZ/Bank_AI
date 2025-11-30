@@ -18,9 +18,9 @@ app.add_middleware(
 )
 
 
-# -----------------------------
+
 #  INPUT MODEL
-# -----------------------------
+
 class LoanApplication(BaseModel):
     age: int = Field(..., ge=18)
     income: float = Field(..., ge=0)
@@ -35,9 +35,9 @@ class LoanApplication(BaseModel):
     loanPurpose: Literal["consumption", "car", "education", "business", "house", "other"]
 
 
-# -----------------------------
+
 #  AGENT 1 – DATA AGENT
-# -----------------------------
+
 class DataAgent:
     def process(self, d: LoanApplication) -> Dict[str, Any]:
         dti = (d.debt + d.expenses) / d.income if d.income > 0 else 1e9
@@ -59,9 +59,9 @@ class DataAgent:
         }
 
 
-# -----------------------------
+
 #  AGENT 2 – RISK AGENT
-# -----------------------------
+
 class RiskAgent:
     def evaluate(self, p: Dict[str, Any]) -> Dict[str, Any]:
         risk_score = 0
@@ -126,9 +126,9 @@ class RiskAgent:
         }
 
 
-# -----------------------------
+
 #  AGENT 3 – COMPLIANCE AGENT
-# -----------------------------
+
 class ComplianceAgent:
     def check(self, p: Dict[str, Any]) -> Dict[str, Any]:
         reasons = []
@@ -144,9 +144,9 @@ class ComplianceAgent:
         return {"status": status, "reasons": reasons}
 
 
-# -----------------------------
+
 #  AGENT 4 – DECISION AGENT
-# -----------------------------
+
 class DecisionAgent:
     def decide(self, p, risk, compliance):
         if compliance["status"] == "fail":
@@ -174,9 +174,9 @@ class DecisionAgent:
         }
 
 
-# -----------------------------
+
 #  AGENT 5 – EXPLANATION AGENT
-# -----------------------------
+
 class ExplanationAgent:
     """
     Generates deep financial analysis, extended recommendations,
@@ -260,9 +260,8 @@ renegotiation of conditions or access to more favorable rates would be technical
         }
 
 
-# -----------------------------
 #  DASHBOARD METRICS + CHART DATA
-# -----------------------------
+
 def build_dashboard(p: Dict[str, Any], risk: Dict[str, Any], compliance: Dict[str, Any]):
     income = p["income"]
     expenses = p["expenses"]
@@ -362,9 +361,9 @@ def build_dashboard(p: Dict[str, Any], risk: Dict[str, Any], compliance: Dict[st
     return charts, metrics, traffic_lights
 
 
-# -----------------------------
+
 #  ENDPOINT
-# -----------------------------
+
 @app.post("/evaluate-loan-advanced")
 def evaluate(application: LoanApplication):
     data = DataAgent().process(application)
