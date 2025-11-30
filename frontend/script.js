@@ -1,6 +1,6 @@
-// -------------------------------------------
+
 // FORM → RESULTS REDIRECT
-// -------------------------------------------
+
 function goToResults() {
     const required = [
         "age", "income", "expenses", "debt",
@@ -35,9 +35,9 @@ function goToResults() {
 }
 
 
-// -------------------------------------------
+
 // RESULTS PAGE LOGIC
-// -------------------------------------------
+
 if (window.location.pathname.includes("result.html")) {
     const formData = JSON.parse(sessionStorage.getItem("loanFormData") || "{}");
 
@@ -66,9 +66,9 @@ if (window.location.pathname.includes("result.html")) {
 }
 
 
-// -------------------------------------------
+
 // DECISION + BADGE
-// -------------------------------------------
+
 function renderDecision(api) {
     const d = api.final_decision;
     decisionText.textContent = d.decision;
@@ -83,9 +83,9 @@ function renderDecision(api) {
 }
 
 
-// -------------------------------------------
+
 // EXECUTIVE SUMMARY + TRAFFIC LIGHTS
-// -------------------------------------------
+
 function renderExecutiveSummary(api) {
     const metrics = api.dashboard_metrics;
     const risk = api.risk_analysis;
@@ -131,9 +131,9 @@ function renderExecutiveSummary(api) {
 }
 
 
-// -------------------------------------------
+
 // RISK GAUGE
-// -------------------------------------------
+
 let gaugeChart;
 function renderRiskGauge(api) {
     const risk = api.risk_analysis;
@@ -167,9 +167,9 @@ function renderRiskGauge(api) {
 }
 
 
-// -------------------------------------------
+
 // KEY FINANCIAL METRICS (Income / Expenses / Debt)
-// -------------------------------------------
+
 let incomeChart;
 function renderMetricsChart(api) {
     const ch = api.charts.income_vs_expenses;
@@ -199,9 +199,9 @@ function renderMetricsChart(api) {
 }
 
 
-// -------------------------------------------
+
 // DTI SCENARIOS CHART
-// -------------------------------------------
+
 let dtiChart;
 function renderDTIChart(api) {
     const d = api.charts.dti_simulation;
@@ -227,9 +227,9 @@ function renderDTIChart(api) {
 }
 
 
-// -------------------------------------------
+
 // AFFORDABILITY CHART
-// -------------------------------------------
+
 let affordChart;
 function renderAffordChart(api) {
     const a = api.charts.affordability;
@@ -253,9 +253,9 @@ function renderAffordChart(api) {
 }
 
 
-// -------------------------------------------
+
 // CREDIT SCORE CHART
-// -------------------------------------------
+
 let scoreChart;
 function renderScoreChart(api) {
     const s = api.charts.credit_score.score;
@@ -285,9 +285,9 @@ function renderScoreChart(api) {
 }
 
 
-// -------------------------------------------
+
 // LOAN TO INCOME CHART
-// -------------------------------------------
+
 let ltiChart;
 function renderLTIChart(api) {
     const r = api.charts.loan_to_income.ratio * 100;
@@ -311,9 +311,9 @@ function renderLTIChart(api) {
 }
 
 
-// -------------------------------------------
+
 // AGENT ANALYSIS (Risk + Compliance)
-// -------------------------------------------
+
 function renderAgentAnalysis(api) {
     const risk = api.risk_analysis;
     const comp = api.compliance_analysis;
@@ -340,9 +340,8 @@ function renderAgentAnalysis(api) {
 }
 
 
-// -------------------------------------------
 // TEXT ANALYSIS (DEEP, RECOMMENDATIONS, CONCLUSION, INTEREST)
-// -------------------------------------------
+
 function renderTextAnalysis(api) {
     deepAnalysis.textContent = api.deep_analysis;
     recommendations.textContent = api.recommendations;
@@ -351,9 +350,9 @@ function renderTextAnalysis(api) {
 }
 
 
-// -------------------------------------------
+
 // COLLAPSIBLE CARDS
-// -------------------------------------------
+
 function toggleCollapse(bodyId) {
     const body = document.getElementById(bodyId);
     const icon = document.getElementById("icon-" + bodyId);
