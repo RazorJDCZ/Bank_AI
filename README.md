@@ -3,6 +3,7 @@
 This project implements a web-based loan evaluation system powered by a multi-agent architecture using the OpenAI API. We have made a full stack ML project with both frontend, backend and AI agentic concepts
 It analyzes a user's financial profile through specialized agents (Risk, Compliance, Decision, Explanation) and generates a detailed dashboard with metrics, visualizations, summaries, recommendations, and risk-level indicators. This project is for the VT-Ecuador group project
 
+Demo Link: https://youtu.be/haFGxU_iGtw 
 ---
 
 ## 🛠️ Technologies Used
