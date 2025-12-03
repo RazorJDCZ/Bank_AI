@@ -126,7 +126,7 @@ Bank_AI/
 │── data/
 │── docs/
 │── report/
-│── tests/
+│── test/
 │── README.md
 ```
 5. Run the backend server
